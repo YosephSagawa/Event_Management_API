@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
-
+from django.contrib.auth.models import Group, Permission
 # Custom User model
 class User(AbstractUser):
     ROLE_CHOICES = [
@@ -12,6 +12,24 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='user')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Override groups field to avoid reverse accessor clash
+    groups = models.ManyToManyField(
+        Group,
+        related_name='events_user_groups',  # Unique related_name
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_query_name='events_user',
+    )
+
+    # Override user_permissions field to avoid reverse accessor clash
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='events_user_permissions',  # Unique related_name
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_query_name='events_user',
+    )
 
     def __str__(self):
         return self.username
