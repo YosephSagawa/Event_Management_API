@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from datetime import timezone
+from .models import Event
 
 User = get_user_model() # Gets the customer User Model
 
@@ -22,6 +24,25 @@ class UserSerializer(serializers.ModelSerializer):
         user.role = validated_data.get('role', 'user')
         user.save()
         return user
+    
+class EventSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        model = Event
+        fields = ['id', 'title', 'description', 'location', 'date', 'category', 'author', 'capacity', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'author','created_at', 'updated_at']
+
+    # Function to prevent past dates
+    def validate_date(self, value):
+        if value < timezone.now():
+            raise serializers.ValidationError("Event date cannot be in the past.")
+        return value
+
+    def create(self, validated_data):
+        validated_data['author'] = self.context['request'].user
+        return super().create(validated_data)
+
     
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
