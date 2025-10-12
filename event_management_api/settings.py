@@ -27,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+#Custom user Model
+AUTH_USER_MODEL = "events.User"
+
 
 # Application definition
 
@@ -82,8 +85,7 @@ DATABASES = {
     }
 }
 
-#Custom user Model
-AUTH_USRE_MODEL = "events.User"
+
 
 
 # Password validation
