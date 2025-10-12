@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework_simplejwt",
     "events",
 ]
 
@@ -80,6 +82,9 @@ DATABASES = {
     }
 }
 
+#Custom user Model
+AUTH_USRE_MODEL = "events.User"
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -99,6 +104,26 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # Use JWT for auth
+        'rest_framework.authentication.SessionAuthentication',  # Fallback for browser testing
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Require login for all APIs by default
+    ],
+}
+
+# JWT settings (optional but recommended for token expiration)
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Token expires after 1 hour
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Refresh token for getting new access tokens
+    'AUTH_HEADER_TYPES': ('Bearer',),               # How tokens are sent in headers
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
