@@ -61,6 +61,15 @@ class Event(models.Model):
     # Custom method to check if event is upcoming
     def is_upcoming(self):
         return self.date > timezone.now()
+    
+    # Custom method to check remaining capacity
+    def remaining_capacity(self):
+        registered_count = self.registrations.filter(status = 'registered').count()
+        return self.capacity - registered_count if self.capacity > 0 else 0
+    
+    # Custom method to check if event is full
+    def is_full(self):
+        return self.remaining_capacity() <= 0
 
 # Favorite model as per schema
 class Favorite(models.Model):

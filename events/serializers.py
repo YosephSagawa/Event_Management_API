@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from datetime import timezone
-from .models import Event
+from .models import Event, Registration
 
 User = get_user_model() # Gets the customer User Model
 
@@ -50,3 +50,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token['role'] = user.role # Add custom claims to the token
         return token
+    
+class RegistrationSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username') # Show username
+    event = serializers.ReadOnlyField(source='event.title') # Show event title
+
+    class Meta:
+        model = Registration
+        field = ['id', 'user', 'event', 'status', 'created_at']
+        read_only_fields = ['id', 'user', 'event', 'status','created_at']
