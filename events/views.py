@@ -3,10 +3,10 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
-from .serializers import UserSerializer, CustomTokenObtainPairSerializer, EventSerializer,RegistrationSerializer
+from .serializers import UserSerializer, CustomTokenObtainPairSerializer, EventSerializer,RegistrationSerializer, CaategorySerializer
 from django.contrib.auth import get_user_model
 from .permissions import IsOwnerOrReadOnly
-from .models import Event, Registration
+from .models import Event, Registration, Category
 from django.utils import timezone
 from django.db.models import Q
 
@@ -59,6 +59,7 @@ class EventListCreateView(generics.ListCreateAPIView):
         location = self.request.query_params.get('location')
         start_date = self.request.query_params.get('start_date')
         end_date = self.request.query_params.get('end_date')
+        category_id = self.request.query_params.get('category')
 
         if title:
             queryset = queryset.filter(title__icontains=title)
@@ -68,6 +69,8 @@ class EventListCreateView(generics.ListCreateAPIView):
             queryset = queryset.filter(date__gte=start_date)
         if end_date:
             queryset = queryset.filter(date__lte=end_date)
+        if category_id:
+            queryset = queryset.filter(category__id=category_id)
 
         return queryset
     
@@ -112,4 +115,15 @@ class EventRegisterView(APIView):
             return Response({"message": "Unregistered successfully"}, status=status.HTTP_204_NO_CONTENT)
         except (Event.DoesNotExist, Registration.DoesNotExist):
             return Response({"error": "Registration not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class CategoryListCreateView(generics.ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CaategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+class CategoryDetailView(generics.RetrieveUpdateDestroyAPIVIew):
+    queryset = Category.objects.all()
+    serializer_class = CaategorySerializer
+    permission_classes = [permissions.IsAdminUser]
     
