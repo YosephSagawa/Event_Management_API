@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from datetime import timezone
 from .models import Event, Registration, Category
+from django.utils import timezone
 
 User = get_user_model() # Gets the customer User Model
 
@@ -57,12 +58,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Registration
-        field = ['id', 'user', 'event', 'status', 'created_at']
+        fields = ['id', 'user', 'event', 'status', 'created_at']
         read_only_fields = ['id', 'user', 'event', 'status','created_at']
 
-class CaategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id','name','description','created_at']
         read_only_fields = ['id','created_at']
-        

@@ -3,7 +3,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
-from .serializers import UserSerializer, CustomTokenObtainPairSerializer, EventSerializer,RegistrationSerializer, CaategorySerializer
+from .serializers import UserSerializer, CustomTokenObtainPairSerializer, EventSerializer,RegistrationSerializer, CategorySerializer
 from django.contrib.auth import get_user_model
 from .permissions import IsOwnerOrReadOnly
 from .models import Event, Registration, Category
@@ -98,9 +98,7 @@ class EventRegisterView(APIView):
             return Response({"error": "You are already registered for this event"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Check if event is full
-        status_val = 'registered'
-        if event.is_full():
-            status_val = 'waiting' # Add to waitlist if event is full
+        status_val = 'registered' if not event.is_full() else 'waiting' # Add to waitlist if event is full
         
         # Create registration
         registation = Registration.objects.create(user=request.user, event=event, status=status_val)
@@ -119,11 +117,11 @@ class EventRegisterView(APIView):
 
 class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
-    serializer_class = CaategorySerializer
+    serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-class CategoryDetailView(generics.RetrieveUpdateDestroyAPIVIew):
+class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
-    serializer_class = CaategorySerializer
+    serializer_class = CategorySerializer
     permission_classes = [permissions.IsAdminUser]
     
